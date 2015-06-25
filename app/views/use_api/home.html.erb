@@ -1,0 +1,18 @@
+<h1>Use the Slack API</h1>
+
+<% if session[:access_token] %>
+  <p>Your access token is <%= session[:access_token] %>. You can use it in the
+    following actions:</p>
+  <ul>
+    <li><%= link_to 'test access token', use_api_test_path %></li>
+    <li><%= link_to 'list emojis', use_api_list_emojis_path %></li>
+    <li><%= link_to 'show emojis', use_api_see_emojis_path %></li>
+    <li><%= link_to 'list channels', use_api_list_channels_path %></li>
+    <li><%= link_to 'send a message', use_api_new_message_path %></li>
+  </ul>
+  <%= button_to 'Logout', oauth_logout_path, method: :delete %>
+<% else %>
+  <p>It looks like you haven't authorized this app to use your Slack account. You 
+  can <%= link_to 'do that now', oauth_authorize_path %> or 
+  <%= link_to 'see how it works', oauth_breakdown_step_1_path %>.</p>
+<% end %>

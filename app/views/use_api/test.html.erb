@@ -1,0 +1,9 @@
+<h1>Slack API Test Results</h1>
+
+<p>The response from the Slack API was:</p>
+<pre><code>
+  <%= raw ap(@response.parsed_response) %>
+</code></pre>
+<%= link_to 'Documentation', 'https://api.slack.com/methods/auth.test' %>
+<hr>
+<%= link_to 'Home', root_path %>

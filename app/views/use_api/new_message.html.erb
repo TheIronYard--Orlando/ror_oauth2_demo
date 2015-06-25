@@ -1,0 +1,10 @@
+<h1>Send a Message to Slack</h1>
+
+<p>Fill in the message you want RailsBot to send to the class channel:</p>
+<%= form_tag use_api_message_path do %>
+  <%= text_area_tag :text, nil, rows: 10, cols: 70 %>
+  <%= submit_tag 'Go RailsBot Go!' %>
+<% end %>
+<%= link_to 'Documentation', 'https://api.slack.com/methods/chat.postMessage' %>
+<hr>
+<%= link_to 'Home', root_path %>

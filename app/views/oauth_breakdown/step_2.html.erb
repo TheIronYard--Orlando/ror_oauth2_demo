@@ -1,0 +1,77 @@
+<h1>OauthBreakdown#step_2</h1>
+
+<h2>The Documentation</h2>
+
+<h3>Step 2 - Token Issuing</h3>
+
+<p>If the user accepts your request, Slack redirects back to your site with a temporary code in a GET 
+<code>code</code> parameter as well as the state you provided in the previous step in a <code>state</code> parameter.
+If the states don't match, the request has been created by a third party and the process should be
+aborted.</p>
+
+<p>If all is well, exchange the code for an access token using the <a href="/methods/oauth.access"><code>oauth.access</code></a>
+API method (<a href="/methods/oauth.access">method documentation</a>).</p>
+
+<pre><code>https://slack.com/api/oauth.access
+
+client_id     - issued when you created your application (required)
+client_secret - issued when you created your application (required)
+code          - the code param (required)
+redirect_uri  - must match the originally submitted URI (if one was sent)
+</code></pre>
+
+<p>The response JSON will contain an access token:</p>
+
+<pre><code>{
+    "access_token": "xoxt-23984754863-2348975623103",
+    "scope": "read"
+}
+</code></pre>
+
+<p>You can then use this token to call protected API methods on behalf of the user.</p>
+
+<hr>
+
+<h2>The Implementation</h2>
+
+<p>Between step 1 of the documentation and this step, the user is redirected
+  to a page on the Slack website that looks like this:</p>
+<%= image_tag 'auth_screen' %>
+
+<p>Assuming the user agrees to authorize the app to do things, Slack then 
+  redirects the user back to the app, at a URL like</p>
+
+<pre><code>http://localhost:3000/oauth?code=SOME_SECRET_VALUE&state=THE_VALUE_STATE_HAD_IN_STEP_1</code></pre>
+
+<p>Note that the code and state in that URL are accessible in the app
+  as <code>params[:code]</code> and <code>params[:state]</code>, respectively.</p>
+
+<p>That gets handled in the app as follows:</p>
+
+<pre><code>
+  <em># in config/routes.rb</em>
+
+  get '/oauth/request_access_token' => 'oauth#request_access_token'
+
+  <em># in app/controllers/oauth_controller.rb</em>
+
+  def request_access_token
+    if session[:state] == params[:state]
+      response = HTTParty.get(SLACK[:api_url] + SLACK[:request_token_uri], query: {
+        client_id:     SLACK[:client_id],
+        client_secret: SLACK[:client_secret],
+        code:          params[:code],
+        redirect_uri:  'http://localhost:3000/oauth/request_access_token'
+      })
+      session[:access_token] = response.parsed_response["access_token"]
+      redirect_to root_url, notice: "You can now post to Slack from this app"
+    else
+      redirect_to root_url, notice: "There was a problem requesting an access token; 
+      params[:state] was #{params[:state]} and session[:state] is #{session[:state]}"
+    end
+  end
+</code></pre>
+
+<%= link_to 'Back to step 1', oauth_breakdown_step_1_path %>
+<hr>
+<%= link_to 'Go back home', root_path %>

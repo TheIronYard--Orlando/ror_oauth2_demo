@@ -1,0 +1,45 @@
+<h1>OauthBreakdown#step_1</h1>
+
+<h2>The Documentation</h2>
+
+<h3>Step 1 - Authorization</h3>
+
+<p>The authenticating web application should redirect users to the following URL:</p>
+
+<pre><code>https://slack.com/oauth/authorize
+</code></pre>
+
+<p>The following values should be passed as GET parameters:</p>
+
+<pre><code>client_id    - issued when you created your application (required)
+redirect_uri - URL to redirect back to (see below) (optional)
+scope        - permissions to request (see below) (optional)
+state        - unique string to be passed back upon completion
+team         - Slack team ID to restrict to (optional)
+</code></pre>
+
+<p>The <code>state</code> parameter should be used to avoid forgery attacks by passing in a value that's unique
+to the user you're authenticating and checking it when auth completes.</p>
+
+<hr>
+
+<h2>The Implementation</h2>
+
+<pre><code>
+  # in app/controllers/oauth_controller.rb
+
+  def authorize
+    session[:state] = masked_authenticity_token(session).gsub(/\s/,'+')
+    redirect_to "#{SLACK[:authorize_uri]}?client_id=#{SLACK[:client_id]}&
+    redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth%2Frequest_access_token&
+    scope=#{SLACK[:scope]}&state=#{session[:state]}&team=#{SLACK[:team]}"
+  end
+  # see config/initializers/slack_params.rb for the SLACK hash
+
+  # note I want to redirect to http://localhost:3000/oauth
+  # but the two characters : and / aren't allowed in a URL query string
+  # (the part after the question mark), so they're replaced with %3A and %2F
+  # respectively
+</pre></code>
+
+<%= link_to 'On to step 2', oauth_breakdown_step_2_path %>

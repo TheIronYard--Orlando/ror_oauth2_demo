@@ -1,0 +1,11 @@
+<h1>Slack Emojis</h1>
+
+<p>Here are all the emojis you could be using in Slack (now with pictures!):</p>
+<pre><code>
+  <% @emoji_list_hash.sort_by{|name, image| name}.each do |name, image| %>
+    <%= name %> <%= image_tag image, size: '24x24' %>
+  <% end %>
+</code></pre>
+<%= link_to 'Documentation', 'https://api.slack.com/methods/emoji.list' %>
+<hr>
+<%= link_to 'Home', root_path %>
