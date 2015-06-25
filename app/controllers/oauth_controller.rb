@@ -1,7 +1,7 @@
 class OauthController < ApplicationController
 
   def authorize
-    session[:state] = masked_authenticity_token(session).gsub(/\s/,'+')
+    session[:state] = masked_authenticity_token(session).gsub(/\+/,' ')
     redirect_to "#{SLACK[:authorize_uri]}?client_id=#{SLACK[:client_id]}&
     redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth%2Frequest_access_token&
     scope=#{SLACK[:scope]}&state=#{session[:state]}&team=#{SLACK[:team]}"
